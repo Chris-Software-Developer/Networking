@@ -30,10 +30,19 @@ class ViewController: UIViewController {
         self.currencyLabel.font = UIFont(name: currencyLabel.font.fontName, size: 60)
         self.valueLabel.font = UIFont(name: valueLabel.font.fontName, size: 60)
         self.currentTimeLabel.font = UIFont(name: currentTimeLabel.font.fontName, size: 18)
+        
+        Timer.scheduledTimer(withTimeInterval: 10, repeats: true) { [unowned self] (timer) in
+            self.downloadData()
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
         
+    }
+    
+    // MARK: - Convenience Methods
+    
+    func downloadData() {
         guard let url = URL(string: urlString) else {
             print("Error: Could not create Url")
             return
@@ -75,8 +84,6 @@ class ViewController: UIViewController {
         }
         task.resume()
     }
-    
-    // MARK: - Convenience Methods
     
     func formattedDate(_ date: Date) -> String {
         
