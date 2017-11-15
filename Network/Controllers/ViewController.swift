@@ -25,42 +25,8 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let currentDateTime = Date()
-        let dateFormatter = DateFormatter()
-        let todayDate = Date()
-        let myCalendar = Calendar(identifier: .gregorian)
-        let myComponents = myCalendar.component(.weekday, from: todayDate)
-        let weekDay = myComponents
-        
-        func weekDayString(fromNumber weekDay: Int) -> String {
-            
-            switch weekDay {
-                
-            case 0:
-                return "Sunday"
-            case 1:
-                return "Monday"
-            case 2:
-                return "Tuesday"
-            case 3:
-                return "Wednesday"
-            case 4:
-                return "Thursday"
-            case 5:
-                return "Friday"
-            case 6:
-                return "Saturday"
-            default:
-                return "Unknown day"
-            }
-        }
-        
-        dateFormatter.timeStyle = .short
         self.title = "Bitcoin Value"
         
-        let finalTime = weekDayString(fromNumber: weekDay) + " " + dateFormatter.string(from: currentDateTime)
-        
-        self.currentTimeLabel.text = finalTime
         self.currencyLabel.font = UIFont(name: currencyLabel.font.fontName, size: 60)
         self.valueLabel.font = UIFont(name: valueLabel.font.fontName, size: 60)
         self.currentTimeLabel.font = UIFont(name: currentTimeLabel.font.fontName, size: 18)
@@ -73,7 +39,7 @@ class ViewController: UIViewController {
             return
         }
         
-        let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
+        let task = URLSession.shared.dataTask(with: url) { [unowned self] (data, response, error) in
             
             if let data = data {
                 
@@ -96,6 +62,10 @@ class ViewController: UIViewController {
                                     self.valueLabel.text = value
                                 }
                             }
+                            
+                            DispatchQueue.main.async { [unowned self] in
+                                self.currentTimeLabel.text = self.formattedDate(Date())
+                            }
                         }
                     }
                 } catch {
@@ -104,5 +74,49 @@ class ViewController: UIViewController {
             }
         }
         task.resume()
+    }
+    
+    // MARK: - Convenience Methods
+    
+    func formattedDate(_ date: Date) -> String {
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeStyle = .short
+        
+        let myCalendar = Calendar(identifier: .gregorian)
+        let weekDayIndex = myCalendar.component(.weekday, from: date)
+        let weekDayString = self.weekDayString(fromNumber: weekDayIndex)
+        
+        return "\(weekDayString) \(dateFormatter.string(from: date))"
+    }
+    
+    func weekDayString(fromNumber weekDay: Int) -> String {
+        
+        switch weekDay {
+            
+        case 0:
+            return "Sunday"
+            
+        case 1:
+            return "Monday"
+            
+        case 2:
+            return "Tuesday"
+            
+        case 3:
+            return "Wednesday"
+            
+        case 4:
+            return "Thursday"
+            
+        case 5:
+            return "Friday"
+            
+        case 6:
+            return "Saturday"
+            
+        default:
+            return "Unknown day"
+        }
     }
 }
